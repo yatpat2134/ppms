@@ -2,10 +2,10 @@
 // 1. ตั้งค่าเวลาของ PHP ให้เป็นไทย (กันเหนียว)
 date_default_timezone_set('Asia/Bangkok');
 
-$host = 'db';  // ชื่อ Host ใน Docker
-$db   = 'project_archive';
-$user = 'root';
-$pass = 'root'; // รหัสผ่าน Docker
+$host = 'localhost';  // ชื่อ Host ใน Docker
+$db   = 'ppms';
+$user = 'ppms';
+$pass = 'bnccitconfigppms'; // รหัสผ่าน Docker
 
 try {
     // เชื่อมต่อฐานข้อมูล
