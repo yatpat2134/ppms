@@ -1,8 +1,111 @@
 @charset "UTF-8";
 
+/* =========================================
+   1. Global & Layout (ตั้งค่าทั่วไป)
+   ========================================= */
 body {
     font-family: 'Sarabun', sans-serif;
     background-color: #f8f9fa;
+    overflow-x: hidden;
+    display: flex;       /* เพิ่มเพื่อให้ Footer จัดการง่ายขึ้น */
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+/* Navbar: ปรับเงาให้ดูแพงขึ้น */
+.navbar {
+    background: linear-gradient(135deg, #0d6efd 0%, #002d72 100%) !important;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.15); /* เงาเข้มขึ้นนิดนึงเพื่อให้แยกชั้นชัดเจน */
+    padding-top: 0.8rem;
+    padding-bottom: 0.8rem;
+}
+
+.navbar-brand img {
+    border: 2px solid rgba(255, 255, 255, 0.8);
+    border-radius: 50%;
+}
+
+/* =========================================
+   2. Landing Page Styles (หน้าแรก)
+   ========================================= */
+.hero-section {
+    background: linear-gradient(135deg, #0d6efd 0%, #002d72 100%);
+    color: white;
+    
+    /* ✅ แก้จุดที่ 1: ปรับระยะห่าง (Padding) */
+    /* 160px ด้านบน = ดันข้อความลงมาให้พ้นเมนู */
+    /* 180px ด้านล่าง = เผื่อพื้นที่ให้การ์ดเลื่อนขึ้นมาทับ */
+    padding: 160px 0 180px; 
+    
+    border-radius: 0; 
+    position: relative;
+    overflow: hidden;
+    
+    /* ✅ แก้จุดที่ 2: เปลี่ยนเป็น 0 (ของเดิม -24px มันดึงขึ้นไปชนขอบบนเกินไป) */
+    margin-top: 0;
+}
+
+/* ลวดลายวงกลมจางๆ พื้นหลัง */
+.hero-section::before {
+    content: "";
+    position: absolute;
+    top: -40%;
+    right: -10%;
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%);
+    z-index: 0;
+    pointer-events: none;
+}
+
+/* --- กล่องเนื้อหาหลัก (การ์ด 3 ใบ) --- */
+.content-box {
+    position: relative;
+    z-index: 10; /* ดึงให้อยู่เหนือพื้นหลัง */
+    
+    /* ✅ แก้จุดที่ 3: ดึงขึ้นมาทับส่วนสีฟ้าเยอะๆ (-150px) */
+    margin-top: -150px; 
+    
+    min-height: 50vh;      
+    padding-bottom: 60px;
+}
+
+/* การ์ดฟีเจอร์ 3 ใบ */
+.feature-card {
+    border: none;
+    border-radius: 12px; /* ลดความมนลงนิดหน่อยให้ดูทางการ */
+    background: white;
+    height: 100%;
+    
+    /* เงาเริ่มต้นให้นุ่มนวล */
+    box-shadow: 0 10px 30px rgba(0,0,0,0.08); 
+    transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.3s ease;
+}
+
+.feature-card:hover {
+    transform: translateY(-7px); /* ขยับขึ้นพองาม ไม่กระโดด */
+    box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+}
+
+.icon-box {
+    width: 70px;
+    height: 70px;
+    background-color: #f0f7ff; /* สีจางลงนิดนึงให้สบายตา */
+    color: #0d6efd;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    margin-bottom: 20px;
+}
+
+/* =========================================
+   3. Dashboard & Table Styles (หน้าจัดการ)
+   ========================================= */
+#main-content {
+    display: none;
+    padding-top: 30px; /* เพิ่มระยะห่างจาก Navbar นิดหน่อย */
 }
 
 .card {
@@ -11,76 +114,88 @@ body {
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
 }
 
+#projectTable {
+    vertical-align: middle;
+}
+
 #projectTable thead th {
-    background-color: #e9ecef;
+    background-color: #f8f9fa; /* สีพื้นหัวตารางให้อ่อนลง */
     color: #495057;
     font-weight: 600;
     text-align: center;
-    vertical-align: middle;
-    white-space: nowrap;
-    border-bottom: 2px solid #dee2e6;
+    border-bottom: 2px solid #e9ecef;
+    padding: 15px; /* เพิ่มพื้นที่หัวตาราง */
 }
 
-/* จัดการรูปปก (A4 Size: Width 70px -> Height ~99px) */
+/* --- ส่วนรูปภาพ --- */
 .cover-img {
     width: 70px;
-    height: 100px; /* ใกล้เคียง A4 */
+    height: 100px; 
     object-fit: cover;
     border-radius: 4px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.15);
-    border: 1px solid #ddd;
-    transition: transform 0.2s;
+    border: 1px solid #dee2e6;
     background-color: white;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+
+    transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+    transform-origin: center center; 
+    position: relative;
+    z-index: 1;
+    cursor: zoom-in;
 }
 
 .cover-img:hover {
-    transform: scale(1.5);
-    z-index: 10;
-    position: relative;
-    border-color: #000000;
+    transform: scale(1.8);
+    z-index: 1000;
+    border-radius: 6px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+    border: 3px solid white;
 }
 
 .badge-dept {
     display: inline-block;
-    background-color: #f1f3f5;
-    color: #495057;
-    padding: 3px 8px;
-    border-radius: 4px;
+    background-color: #ffffff;
+    color: #555;
+    padding: 4px 10px;
+    border-radius: 6px;
     font-size: 0.85em;
-    margin-top: 5px;
-    border: 1px solid #dee2e6;
+    margin-top: 6px;
+    border: 1px solid #e9ecef;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
 }
 
-.badge-year {
-    font-size: 0.9em;
-    background-color: #425eff;
-}
-
-/* ✅✅✅ เพิ่มส่วนนี้ไว้ล่างสุดครับ ✅✅✅ */
-/* ลบเงาสีฟ้าเวลาคลิก (Focus Ring) ออกจากปุ่มและช่องกรอกข้อมูล */
+/* =========================================
+   4. Interaction & Buttons (ลูกเล่นปุ่ม)
+   ========================================= */
 .btn:focus, .btn:active, 
 .form-control:focus, 
 .form-select:focus,
 button:focus,
 a:focus {
     outline: none !important;
-    box-shadow: none !important;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15) !important; 
+    border-color: #86b7fe;
 }
-/* ✅✅✅ เพิ่มเอฟเฟกต์ปุ่มขยับได้ ✅✅✅ */
 
-/* ตั้งค่าให้ปุ่มทุกปุ่มมีการขยับที่นุ่มนวล */
 .btn {
     transition: all 0.2s ease-in-out !important;
+    font-weight: 500;
 }
 
-/* 1. ตอนเอาเมาส์ชี้ (Hover): ให้ปุ่มลอยขึ้นนิดนึง + มีเงา */
 .btn:hover {
-    transform: translateY(-3px); /* ลอยขึ้น 3 pixel */
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2); /* เพิ่มเงาให้ดูเหมือนลอย */
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
-/* 2. ตอนกดค้าง (Active): ให้ปุ่มยุบลงเหมือนโดนกดจริง */
 .btn:active {
-    transform: scale(0.95) !important; /* ย่อขนาดลงเหลือ 95% */
-    box-shadow: none !important; /* เอาเงาออก */
+    transform: scale(0.98) !important;
+}
+
+/* Footer Control */
+footer {
+    margin-top: auto;
+    padding: 20px 0;
+    text-align: center;
+    color: #6c757d;
+    font-size: 0.9rem;
 }

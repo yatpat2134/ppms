@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>เกี่ยวกับผู้จัดทำ | Project Archive</title>
+    <title>เกี่ยวกับผู้จัดทำ | Professional project storage system</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
@@ -44,7 +44,7 @@
 
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container">
-            <a class="navbar-brand" href="index.php">Project Archive</a>
+            <a class="navbar-brand" href="index.php">Professional project storage system</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -170,7 +170,7 @@
                 <div class="alert alert-light border shadow-sm text-start p-4">
                     <h4 class="fw-bold text-primary">เกี่ยวกับโครงงานนี้</h4>
                     <p>
-                        ระบบจัดเก็บโครงงาน (Project Archive) พัฒนาขึ้นเพื่อรวบรวมข้อมูลโครงงานของนักเรียน/นักศึกษา 
+                        ระบบจัดเก็บโครงงานวิชาชีพ (Professional project storage system) พัฒนาขึ้นเพื่อรวบรวมข้อมูลโครงงานของนักเรียน/นักศึกษา 
                         เพื่อให้ผู้สนใจสามารถเข้ามาสืบค้น ศึกษา และนำไปต่อยอดได้สะดวกยิ่งขึ้น 
                     </p>
                 </div>

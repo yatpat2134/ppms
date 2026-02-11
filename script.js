@@ -5,92 +5,120 @@ var currentUserEmail = '';
 var currentUserName = '';  
 
 $(document).ready(function() {
+    // ✅ 1. สั่งให้ Animation (AOS) ทำงาน
+    // (ต้องมีบรรทัดนี้ ไม่งั้นที่ใส่ data-aos ไปจะไม่ขยับครับ)
+    if (typeof AOS !== 'undefined') {
+        AOS.init();
+    }
+
+    // 2. ตรวจสอบสิทธิ์การเข้าใช้งานทันทีที่เปิดหน้าเว็บ
     checkSession();
     
-    // นับคนเข้าเว็บ
-    $.post('api.php', { action: 'site_visit' }, function(res) {
-        $('#totalVisitors').text(res.visits);
-    }, 'json');
-
-    // ==========================================
-    // ส่วนที่เพิ่ม: Logic การกรองข้อมูล (Filter)
-    // ==========================================
-    $.fn.dataTable.ext.search.push(
-        function(settings, data, dataIndex) {
-            var selectedYear = $('#filterYear').val();
-            var selectedDept = $('#filterDept').val();
-            
-            // ดึงข้อมูลดิบของแถวนั้น (ไม่ใช่ HTML)
-            if (!table) return true; // กัน Error ตอนโหลดครั้งแรก
-            var rowData = table.row(dataIndex).data();
-
-            if (!rowData) return true;
-
-            // เช็คปีการศึกษา (ถ้าเลือกแล้วไม่ตรง ให้ซ่อน)
-            if (selectedYear && rowData.academic_year != selectedYear) {
-                return false;
-            }
-            // เช็คแผนกวิชา (ถ้าเลือกแล้วไม่ตรง ให้ซ่อน)
-            if (selectedDept && rowData.department != selectedDept) {
-                return false;
-            }
-            return true;
-        }
-    );
-    // ==========================================
-    // จบส่วนที่เพิ่ม
-    // ==========================================
-
-    // ตัวกรอง
-    $('#customSearch').on('keyup', function() { table.search(this.value).draw(); });
-    // เมื่อเปลี่ยน Dropdown ให้สั่งวาดตารางใหม่ (มันจะไปเรียกฟังก์ชันข้างบนทำงาน)
-    $('#filterYear, #filterDept').on('change', function() { table.draw(); });
-
-    // บันทึกโครงงาน (ทั้งเพิ่มและแก้ไข)
-    $('#projectForm').on('submit', function(e) {
-        e.preventDefault();
+    // 3. ถ้าหน้านี้มีตาราง (แปลว่าเป็นหน้า dashboard.php) ถึงจะรันโค้ดจัดการข้อมูล
+    if ($('#projectTable').length > 0) {
         
-        let action = $('#formAction').val();
-        let docFile = $('#docInput').val();
+        // นับคนเข้าเว็บ
+        $.post('api.php', { action: 'site_visit' }, function(res) {
+            $('#totalVisitors').text(res.visits);
+        }, 'json');
 
-        if (action === 'create' && !docFile) {
-            Swal.fire('ข้อมูลไม่ครบ', 'กรุณาอัปโหลดไฟล์เล่มโครงงานก่อนบันทึก', 'warning');
-            return;
-        }
-
-        var formData = new FormData(this);
-        formData.append('uploaded_by', currentUserEmail);
-
-        $.ajax({
-            url: 'api.php', type: 'POST', data: formData, contentType: false, processData: false,
-            success: function(response) {
-                let res = (typeof response === 'string') ? JSON.parse(response) : response;
+        // ==========================================
+        // Logic การกรองข้อมูล (Filter)
+        // ==========================================
+        $.fn.dataTable.ext.search.push(
+            function(settings, data, dataIndex) {
+                var selectedYear = $('#filterYear').val();
+                var selectedDept = $('#filterDept').val();
                 
-                if(res.status === 'success'){
-                    $('#projectModal').modal('hide');
-                    table.ajax.reload(null, false);
-                    Swal.fire('สำเร็จ', 'บันทึกข้อมูลเรียบร้อย', 'success');
-                } else {
-                    Swal.fire('ผิดพลาด', res.message || 'เกิดข้อผิดพลาด', 'error');
+                if (!table) return true;
+                var rowData = table.row(dataIndex).data();
+
+                if (!rowData) return true;
+
+                if (selectedYear && rowData.academic_year != selectedYear) {
+                    return false;
                 }
-            },
-            error: function() {
-                Swal.fire('ผิดพลาด', 'เชื่อมต่อ Server ไม่ได้', 'error');
+                if (selectedDept && rowData.department != selectedDept) {
+                    return false;
+                }
+                return true;
             }
+        );
+
+        // Event Listeners สำหรับหน้า Dashboard
+        $('#customSearch').on('keyup', function() { table.search(this.value).draw(); });
+        $('#filterYear, #filterDept').on('change', function() { table.draw(); });
+
+        // บันทึกโครงงาน
+        $('#projectForm').on('submit', function(e) {
+            e.preventDefault();
+            
+            let action = $('#formAction').val();
+            let docFile = $('#docInput').val();
+
+            if (action === 'create' && !docFile) {
+                Swal.fire('ข้อมูลไม่ครบ', 'กรุณาอัปโหลดไฟล์เล่มโครงงานก่อนบันทึก', 'warning');
+                return;
+            }
+
+            var formData = new FormData(this);
+            formData.append('uploaded_by', currentUserEmail);
+
+            $.ajax({
+                url: 'api.php', type: 'POST', data: formData, contentType: false, processData: false,
+                success: function(response) {
+                    let res = (typeof response === 'string') ? JSON.parse(response) : response;
+                    
+                    if(res.status === 'success'){
+                        $('#projectModal').modal('hide');
+                        table.ajax.reload(null, false);
+                        Swal.fire('สำเร็จ', 'บันทึกข้อมูลเรียบร้อย', 'success');
+                    } else {
+                        Swal.fire('ผิดพลาด', res.message || 'เกิดข้อผิดพลาด', 'error');
+                    }
+                },
+                error: function() {
+                    Swal.fire('ผิดพลาด', 'เชื่อมต่อ Server ไม่ได้', 'error');
+                }
+            });
         });
-    });
+    }
 });
+
+// ==========================================
+// ฟังก์ชันจัดการ Session และ User Interface
+// ==========================================
 
 function checkSession() {
     const storedData = localStorage.getItem('user_data');
-    if (storedData) {
-        const data = JSON.parse(storedData);
-        
-        // ✅ เช็คซ้ำอีกรอบ ถ้าไม่ใช่ admin และไม่ใช่ @bncc.ac.th ให้ดีดออก
-        if (!admins.includes(data.email) && !data.email.endsWith('@bncc.ac.th')) {
-            logout(); 
-            return;
+    const path = window.location.pathname;
+    const page = path.split("/").pop(); // ชื่อไฟล์ปัจจุบัน
+
+    // กรณีที่ 1: ยังไม่ล็อกอิน
+    if (!storedData) {
+        if (page === 'dashboard.php') {
+            window.location.href = 'index.php';
         }
+        return; 
+    }
+
+    // กรณีที่ 2: มีข้อมูลล็อกอินแล้ว
+    const data = JSON.parse(storedData);
+    
+    // ตรวจสอบความถูกต้องของอีเมลอีกครั้ง
+    if (!admins.includes(data.email) && !data.email.endsWith('@bncc.ac.th')) {
+        logout(); 
+        return;
+    }
+
+    // ถ้าล็อกอินแล้ว แต่อยู่หน้า Landing Page ให้ดีดไป Dashboard
+    if (page === 'index.php' || page === '') {
+        window.location.href = 'dashboard.php';
+        return;
+    }
+
+    // ถ้าอยู่หน้า Dashboard แล้ว ให้แสดงผลข้อมูลผู้ใช้
+    if (page === 'dashboard.php') {
         updateUserInterface(data);
     }
 }
@@ -108,6 +136,7 @@ function updateUserInterface(data) {
         $('#role-badge').hide();
     }
 
+    // แสดงข้อมูล User ใน Navbar
     $('#google-btn-wrapper').hide();
     $('#user-info').addClass('d-flex').show();
     $('#logout-btn').show();
@@ -115,6 +144,8 @@ function updateUserInterface(data) {
     $('#user-email').text(data.email);
     $('#login-alert').hide(); 
     $('#main-content').fadeIn(); 
+    
+    // โหลดตาราง
     initTable(); 
 }
 
@@ -140,16 +171,19 @@ function initTable() {
         "dom": 'lrtip', 
         
         "initComplete": function(settings, json) {
-            let years = [...new Set(json.data.map(item => item.academic_year))].sort().reverse();
-            let depts = [...new Set(json.data.map(item => item.department))].sort();
-            
-            let yearSelect = $('#filterYear');
-            yearSelect.html('<option value="">ทั้งหมด</option>');
-            years.forEach(y => { if(y) yearSelect.append(`<option value="${y}">${y}</option>`); });
+            // สร้างตัวเลือกใน Dropdown Filter
+            if(json.data) {
+                let years = [...new Set(json.data.map(item => item.academic_year))].sort().reverse();
+                let depts = [...new Set(json.data.map(item => item.department))].sort();
+                
+                let yearSelect = $('#filterYear');
+                yearSelect.html('<option value="">ทั้งหมด</option>');
+                years.forEach(y => { if(y) yearSelect.append(`<option value="${y}">${y}</option>`); });
 
-            let deptSelect = $('#filterDept');
-            deptSelect.html('<option value="">ทั้งหมด</option>');
-            depts.forEach(d => { if(d) deptSelect.append(`<option value="${d}">${d}</option>`); });
+                let deptSelect = $('#filterDept');
+                deptSelect.html('<option value="">ทั้งหมด</option>');
+                depts.forEach(d => { if(d) deptSelect.append(`<option value="${d}">${d}</option>`); });
+            }
         },
 
         "columns": [
@@ -235,32 +269,66 @@ function deleteProject(id) {
     }); 
 }
 
-// ✅✅✅ แก้ไขส่วนล็อกอิน ให้เช็คอีเมลก่อนเข้าใช้งาน ✅✅✅
+function clearFilter() {
+    $('#customSearch').val('');
+    $('#filterDept').val('');
+    $('#filterYear').val('');
+    if(table) table.search('').columns().search('').draw();
+}
+
+// ==========================================
+// Google Login & Authentication Handlers
+// ==========================================
+
 function handleCredentialResponse(response) { 
     const data = JSON.parse(decodeURIComponent(window.atob(response.credential.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join(''))); 
     
-    // ตรวจสอบเงื่อนไข: ต้องเป็น Admin หรือ อีเมลลงท้าย @bncc.ac.th เท่านั้น
+    // ตรวจสอบเงื่อนไขอีเมล
     if (!admins.includes(data.email) && !data.email.endsWith('@bncc.ac.th')) {
         Swal.fire({
             icon: 'error',
             title: 'เข้าสู่ระบบไม่ได้',
             text: 'กรุณาใช้อีเมล @bncc.ac.th เท่านั้น'
         });
-        return; // หยุดการทำงาน ไม่บันทึกข้อมูล
+        return;
     }
 
     localStorage.setItem('user_data', JSON.stringify(data)); 
-    updateUserInterface(data);
-    location.reload(); // รีโหลดเพื่อให้สถานะล็อกอินทำงานสมบูรณ์
+    
+    // ล็อกอินผ่านแล้ว ให้กระโดดไปหน้า Dashboard
+    window.location.href = 'dashboard.php';
 }
 
 function logout() { 
     localStorage.removeItem('user_data'); 
-    location.reload(); 
+    // ออกระบบแล้ว ให้กระโดดกลับไปหน้า Landing Page
+    window.location.href = 'index.php'; 
 }
-function clearFilter() {
-    $('#customSearch').val('');
-    $('#filterDept').val('');
-    $('#filterYear').val('');
-    table.search('').columns().search('').draw();
+
+// ✅ ฟังก์ชันสำหรับปุ่ม Login มุมขวาบน (Navbar)
+function handleTopLogin() {
+    google.accounts.id.prompt((notification) => {
+        if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
+            // ถ้า Pop-up ไม่ขึ้น (เช่น ติด Cool-down หรือ User ปิดไป)
+            console.log("เหตุผลที่ Popup ไม่ขึ้น:", notification.getNotDisplayedReason());
+
+            // 1. เลื่อนหน้าจอลงไปหากล่อง Login ตัวหลัก
+            const loginCard = document.getElementById('main-login-card');
+            if(loginCard) {
+                loginCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+
+            // 2. เด้งแจ้งเตือนบอก User
+            Swal.fire({
+                icon: 'info',
+                title: 'กรุณาเข้าสู่ระบบ',
+                text: 'เลือกบัญชี Google ในกล่องด้านล่างเพื่อใช้งาน',
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 4000,
+                timerProgressBar: true
+            });
+        }
+    });
 }
