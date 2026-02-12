@@ -203,7 +203,7 @@ function initTable() {
             { 
                 "data": "department", "className": "text-center", "width": "120px",
                 "render": function(data, type, row) {
-                    return `<span class="badge badge-year text-white mb-1">${row.academic_year}</span><br><span class="badge-dept">${data}</span>`;
+                    return `<span class="badge badge-year text-dark mb-1">${row.academic_year}</span><br><span class="badge-dept">${data}</span>`;
                 }
             },
             { 
